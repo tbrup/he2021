@@ -970,8 +970,21 @@ file \verb+jwts.txt+ provided.
 \hypertarget{he21.25-solution}{%
 \subsection{HE21.25 Solution}\label{he21.25-solution}}
 
-\noindent 
+\noindent The file contains a jwt that, when expanded, consists again of
+several jwts.  Use python to expand them all until we reach the bottom and then
+printing the content gives us a list of fragments:
 
+\begin{verbatim}
+f_js0
+n_t0k
+nty_0
+he202
+1{pl3
+k3nZ}
+\end{verbatim}
+
+With a bit of imagination these fragments can be combined into
+\verb+he2021{pl3nty_0f_js0n_t0kk3nZ}+
 
 \hypertarget{he21.26}{%
   \section{HE21.26 Lost}
@@ -997,5 +1010,192 @@ file \verb+lost.pdf+ provided.
 \noindent 
 
 
+
+\hypertarget{he21.27}{%
+  \section{HE21.27 Ghost in a Shell 2}
+  \label{he21.27}}
+\begin{marginfigure}
+    \includegraphics[width=50mm]{images/challenge27.jpg}
+\end{marginfigure}
+
+\begin{verbatim} 
+  _, _,_  _,  _, ___   _ _, _    _,    _, _,_ __, _,  _,    ,  ,  
+ / _ |_| / \ (_   |    | |\ |   /_\   (_  |_| |_  |   |     |  |  
+ \ / | | \ / , )  |    | | \|   | |   , ) | | |   | , | ,   |  |  
+  ~  ~ ~  ~   ~   ~    ~ ~  ~   ~ ~    ~  ~ ~ ~~~ ~~~ ~~~   ~  ~  
+______________________________________________________________________  
+ ,--.     ,--.    
+| oo |   | oo |   
+| ~~ |   | ~~ |   o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  
+|/\/\|   |/\/\|     
+______________________________________________________________________  
+\end{verbatim} 
+
+\noindent Connect to the server, snoop around, and find the flag!
+
+\verb+ssh 46.101.107.117 -p 2108 -l clyde+
+password is: \verb+555-ClYdE+
+Note: The service is restarted every hour at x:00.fell into the pot with the rejected ones!
+
+\hypertarget{he21.27-solution}{%
+\subsection{HE21.27 Solution}\label{he21.27-solution}}
+
+\noindent 
+
+\hypertarget{he21.28}{%
+  \section{HE21.28 Haxxor what 2?}
+  \label{he21.28}}
+\begin{marginfigure}
+    \includegraphics[width=50mm]{images/challenge28.jpg}
+\end{marginfigure}
+
+\noindent I was able to break the first file, but I'm stuck at this one.
+
+Help!
+
+file \verb+haxxorwhat2+ provided.
+
+\subsection{Show Hint (free)}
+\begin{itemize}
+\item This time, the file is not an image.
+\end{itemize}
+
+\hypertarget{he21.28-solution}{%
+\subsection{HE21.28 Solution}\label{he21.28-solution}}
+
+\noindent 
+
+
+\hypertarget{he21.29}{%
+\section{HE21.29 Sailor's Knot}
+  \label{he21.29}}
+\begin{marginfigure}
+    \includegraphics[width=50mm]{images/challenge29.jpg}
+\end{marginfigure}
+
+\noindent There is a huge variety of sailor's knots, but the common thing is they all use rops
+or other types of cords.
+
+\verb+nc 46.101.107.117 2112+
+
+Get a shell and read the flag.
+
+Note: The service is restarted every hour at x:00
+
+file \verb+sailorsknot+ provided.
+
+\subsection{Show Hint (free)}
+\begin{itemize}
+\item Ubuntu 18.04 64 Bit
+\end{itemize}
+
+\hypertarget{he21.29-solution}{%
+\subsection{HE21.29 Solution}\label{he21.29-solution}}
+
+\noindent 
+
+
+
+\hypertarget{he21.30}{%
+\section{HE21.30 Pix FX}
+  \label{he21.30}}
+\begin{marginfigure}
+    \includegraphics[width=50mm]{images/challenge30.jpg}
+\end{marginfigure}
+
+\noindent Hey there! We have our fancy new Pix FX service online!
+
+\noindent Try it out!
+
+\url{http://46.101.107.117:2110}
+
+Note: The service is restarted every hour at x:00
+
+file \verb+sailorsknot+ provided.
+
+\subsection{Show Hint (free)}
+\begin{itemize}
+\item egg
+\end{itemize}
+
+\hypertarget{he21.30-solution}{%
+\subsection{HE21.30 Solution}\label{he21.30-solution}}
+
+\noindent 
+
+
+\hypertarget{he21.31}{%
+\section{HE21.31 Hunny Bunny}
+  \label{he21.31}}
+\begin{marginfigure}
+    \includegraphics[width=50mm]{images/challenge31.jpg}
+\end{marginfigure}
+
+\noindent hunnybunny loves music! Can you figure out what else he loves?
+
+\begin{verbatim}
+4ab56415e91e6d5172ee79d9810e30be5da8af18
+c19a3ca5251db76b221048ca0a445fc39ba576a0
+fdb2c9cd51459c2cc38c92af472f3275f8a6b393
+6d586747083fb6b20e099ba962a3f5f457cbaddb
+5587adf42a547b141071cedc7f0347955516ae13
+\end{verbatim}
+
+⚑ format: he2021{lowercaseonlynospaces}
+
+\subsection{Show Hint (free)}
+\begin{itemize}
+\item The values can be cracked, but they need to be changed somehow first.
+\item One of the values represents the flag prefix.
+\end{itemize}
+
+\hypertarget{he21.31-solution}{%
+\subsection{HE21.31 Solution}\label{he21.31-solution}}
+
+\noindent The lines look like SHA-1 hashes and the hint tells us that one of
+them is the prefix of the flag.  So try out the hash of \verb+he2021{+ and
+compare it to the given hashes.
+
+The first one is very close
+
+\begin{verbatim} 
+input:   4ab56415e91e6d5172ee79d9810e30be5da8af18
+he2021{: 4de56415b91b6a5172bb79a9810b30eb5ad8dc18
+\end{verbatim} 
+
+From comparison, we see that the characters have been exchanged, 'a' with 'd',
+'b' with 'e', and 'c' with 'f'.  So map the given strings using this rule and
+use \verb+hashcat+ to crack the hashes.  From the flag-format, we can limit the
+search to lower case letters only, except that for the last part we know that
+it has to be terminated with a '\}'.  But first let's try if Crackstation finds
+the hashes -- it does!
+
+\begin{verbatim} 
+4de56415b91b6a5172bb79a9810b30eb5ad8dc18:he2021{
+f19d3fd5251ae76e221048fd0d445cf39ed576d0:hunnybunny
+cae2f9fa51459f2ff38f92dc472c3275c8d6e393:ilovemum
+6a586747083ce6e20b099ed962d3c5c457fedaae:somuch
+5587dac42d547e141071fbaf7c0347955516db13:!}
+\end{verbatim} 
+
+\The flag is \verb+he2021{hunnybunnyilovemumsomuch!}+
+
+\hypertarget{he21.32}{%
+\section{HE21.32 Two Yolks}
+  \label{he21.32}}
+\begin{marginfigure}
+    \includegraphics[width=50mm]{images/challenge32.jpg}
+\end{marginfigure}
+
+\noindent This egg has two yolks.
+
+But the second seems to be hidden somehow.
+
+File \verb+twoyolks.png+ provided.
+
+\hypertarget{he21.32-solution}{%
+\subsection{HE21.32 Solution}\label{he21.32-solution}}
+
+\noindent 
 
 \end{document}
