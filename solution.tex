@@ -970,11 +970,19 @@ Crack it and get the Easter Egg!
 \hypertarget{he21.23-solution}{%
 \subsection{HE21.23 Solution}\label{he21.23-solution}}
 
-\noindent The apk can be analysed using a decompiler, we used \verb+jadx-ui+.  What it does:
+\noindent The apk can be analysed using a decompiler, we used \verb+jadx-ui+.
+What the program does does:
+
 \begin{itemize} 
-    \item There is in entry form to get a PIN, this PIN has to match a regular expression of \verb+[a-z][0-9]{4}+
+
+    \item There is in entry form to get a PIN, this PIN has to match a regular
+        expression of \verb+[a-z][0-9]{4}+
+
     \item There is a raw, base64 encoded secret stored as raw.raw.
-    \item The PIN and the raw data are passed to a crypto function, that does an AES decryption.
+
+    \item The PIN and the raw data are passed to a crypto function, that does
+        an AES decryption.
+
     \item If the PIN is correct, we get a picture of an egg.
 \end{itemize}
 
@@ -1083,8 +1091,23 @@ file \verb+tacocat.zip+ provided.
 \hypertarget{he21.24-solution}{%
 \subsection{HE21.24 Solution}\label{he21.24-solution}}
 
-\noindent 
+\noindent The zip-file is password protected.  Everything in the description
+and in the hits points towards an anagram password in lower case.  Cracking
+zips can be done using John the Ripper, but we need a good list of passwords.
+So generate a short program to dump the anagrams up to 9 letters into a file
+start cracking.  First use \verb+zip2john+ to generate the proper input file,
+and then run john:
 
+\begin{verbatim} 
+.\john.exe --wordlist=..\..\level4.txt ..\..\tacocat.hash
+\end{verbatim}
+
+This yields the password \verb+mousesuom+ to open the zip and extract the file
+\verb+eggge.png+ with the flag \verb+he2021{!y0.ban4na.b0y!}+.
+
+\begin{marginfigure}
+    \includegraphics[width=50mm]{ch24/eggge.png}
+\end{marginfigure}
 
 \hypertarget{he21.25}{%
   \section{HE21.25 Lots of JWTs}
@@ -1198,7 +1221,27 @@ file \verb+haxxorwhat2+ provided.
 \hypertarget{he21.28-solution}{%
 \subsection{HE21.28 Solution}\label{he21.28-solution}}
 
-\noindent 
+\noindent From the name of the challenge we assumed that it is again an xor
+encryption.  And from the hint, since it is not an image file, it probably is
+something like a zip-file.  So try to xor the first four bytes with the magic
+number for zip files \verb+0x50 4B 03 04+ using Cyber Chef.  The result is
+encouraging with \verb+xorl+.  So zip is a good guess.  Let's see if we find
+the end of directory record at the end of the file.  And yes, we see the
+tell-tale \verb+PK+ there as well.  By extending the xor-key, we can figure out
+that the xor-key has to be a multiple of 8 characters long -- otherwise the end
+of record loses the \verb+PK+.
+
+Using the specification and looking at the end of file directory entries, we
+can find the values for the last three bytes (they must all be zero).  So we
+end up with \verb+xorl.tan+, only one letter missing.  Opening the decoded
+zip-file, we see a funny file name for a file that must be called
+\verb+egg.png+, so finally we have the complete key \verb+xorlatan+.
+Extracting the zip gives us the egg with the flag
+\verb+he2021{ul1m4te_x0r_m4st3r}+.
+
+\begin{marginfigure}
+    \includegraphics[width=50mm]{ch28/egg.png}
+\end{marginfigure}
 
 
 \hypertarget{he21.29}{%
