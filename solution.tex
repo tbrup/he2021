@@ -584,6 +584,7 @@ Note: The service is restarted every hour at x:00.
 \item Some characters are blocked - find a workaround!
 \end{itemize}
 
+
 \hypertarget{he21.15-solution}{%
 \subsection{HE21.15 Solution}\label{he21.15-solution}}
 
@@ -1062,8 +1063,11 @@ b'Q29uZ3JhdHM='
 It looks like the original message was just reversed in packets of two:
 original is \verb+2Qu93Z+, correct would be \verb+Q29uZ3+.
 
+So do the reversing by hand to get
 \verb+2Qu93ZhJHdsMGIlhmcgUXagMWe19icmBGbnFiOoBTZwIjM7FGd0gHdfNTbuB2a5V2X1JzcuF3MzNQf==+
 \verb+Q29uZ3JhdHMsIGhlcmUgaXMgeW91ciBmbGFnOiBoZTIwMjF7dGg0dHNfbTBua2V5X2J1czFuM3NzfQ==+
+
+Which gives the flag \verb+Congrats, here is your flag: he2021{th4ts_m0nkey_bus1n3ss}+
 
 \hypertarget{he21.23}{%
   \section{HE21.23 Eggcryptor}
@@ -1168,7 +1172,7 @@ public class Main {
 }
 \end{minted}
 
-% <string name="egg">NB2HI4DTHIXS653XO4XHS33VOR2WEZJOMNXW2L3XMF2GG2B7OY6XKYRYGJMGEMKDHBXXG===</string>
+% <string name="egg">NB2HI4DTHIXS653XO4XHS33VOR2WEZJOMNXW2L3XMF2GG2B7OY6XKYRYGJMGEMKDHBXXG===</string>
 % <string name="pattern">[a-z][0-9]{4}</string>
 For the PIN \verb+g0717+ we get the egg 
 \begin{marginfigure}
@@ -1932,4 +1936,3 @@ Ubuntu 18.04 64 Bit
 \noindent 
 
 \end{document}
-
