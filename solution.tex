@@ -1858,7 +1858,47 @@ The flag is \verb+he2021{tw0_y0lks_are_gre33eat}+
 \hypertarget{he21.33-solution}{%
 \subsection{HE21.33 Solution}\label{he21.33-solution}}
 
-\noindent 
+\noindent The title evokes memories of "Finding Nemo", so there could be some
+connection to this movie.  Some research finds that the words given seem to be
+from a technique to create easier to remember "passwords" for block-chain
+wallets.  See e.g.
+\url{https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki} for an
+introduction into the topic and for a description of how the list of words is
+created.  Our list is given in alphabetic order, so we probably have to find out
+the proper ordering.
+
+In short, the words are generating by taking an initial entropy of between 128
+and 256 bits and calculating the
+SHA256 of this entropy. Then the first entropy/32 bits of the SHA256 are
+appended to entropy, giving a new bit-string of 33/32 length of the original
+entropy.  This bit-string is then divided into 11-bit portions, each portion
+corresponds to one word in the wordlist.
+
+So the assumption is that the initial entropy is the flag.  Starting with a test
+entropy of \verb+he2021{123456789012345678901234}+ we can calculate the
+corresponding mnemonic, and it does start with words from the list given in the
+challenge:
+
+\begin{verbatim} 
+half civil metal good bless obtain silver grief cry
+random sock include adapt october smoke mammal curtain 
+right atom gather basket book spin path 
+\end{verbatim}
+
+From here on it is a simple bootstrapping process, start with a crib, check
+which of the leftover words would create a meaningful next step.  We could solve
+this with a typical backtracking algorithm, but it can also done by hand, using
+some knowledge of the film to find the flag.
+
+It corresponds to the mnemonic 
+\begin{verbatim}
+['half','civil','metal','good','bless', 'reason', 'shift', 'home',
+    'garage', 'napkin', 'sunset', 'tongue', 'bind', 'rescue', 'mushroom',
+    'hip', 'hotel', 'lonely', 'blind', 'small', 'adapt', 'craft', 'magnet',
+    'ring']
+\end{verbatim}
+
+The flag is \verb+he2021{f1sh_r_fr1ends_n0t_f00d!}+
 
 \hypertarget{he21.34}{%
 \section{HE21.34 The Five Seasons}
