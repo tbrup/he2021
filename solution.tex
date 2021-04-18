@@ -1900,6 +1900,10 @@ It corresponds to the mnemonic
 
 The flag is \verb+he2021{f1sh_r_fr1ends_n0t_f00d!}+
 
+\subsection{Open end}
+We have the flag, but the second column in the specification of the challenge
+was not used at all!  So is this a hidden challenge or just a red herring?
+
 \hypertarget{he21.34}{%
 \section{HE21.34 The Five Seasons}
   \label{he21.34}}
@@ -1922,7 +1926,11 @@ A hint is hiding in one of the poems.
 \hypertarget{he21.34-solution}{%
 \subsection{HE21.34 Solution}\label{he21.34-solution}}
 
-\noindent 
+\noindent The hint leads us to check the poems for differences to the
+originals, and -- lo and behold -- we find that the spring poem has a
+change: trees has been changed to ``Thymeleafs''.  We probably have to
+exploit a spring/Thymeleaf vulnerability.  Time to research the
+issues.
 
 
 \hypertarget{he21.35}{%
@@ -1944,8 +1952,13 @@ Look at the snake in the title image.
 \hypertarget{he21.35-solution}{%
 \subsection{HE21.35 Solution}\label{he21.35-solution}}
 
-\noindent This is an anagram to be solved; play around with the words to find
-\verb+he2021{dont_fall_into_the_snake_pit!}+
+\noindent This is an anagram to be solved.
+It becomes quite easy, once we take away the known parts of the flag
+(\verb+he2021{}+) and then only lower case characters are present plus
+underscores.  The number of underscores is the number of words sought minus
+one.  \verb+snake+ could be part of the flag, so play around with the words to find
+\verb+he2021{dont_fall_into_the_snake_pit!}+.
+
 
 
 \hypertarget{he21.36}{%
