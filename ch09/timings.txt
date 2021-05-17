@@ -1,0 +1,107 @@
+Windows gaming machine:
+
+
+Elixir:
+ca 25MB
+
+PS C:\Users\brp\Documents\he2021\ch09\elixir09> Measure-Command {mix run -e 'Elixir09.main'}
+
+Days              : 0
+Hours             : 0
+Minutes           : 5
+Seconds           : 23
+Milliseconds      : 944
+Ticks             : 3239445219
+TotalDays         : 0.00374935789236111
+TotalHours        : 0.0899845894166667
+TotalMinutes      : 5.399075365
+TotalSeconds      : 323.9445219
+TotalMilliseconds : 323944.5219
+
+ReScript:
+
+ca. 50MB
+
+PS C:\Users\brp\Documents\he2021\ch09\re09> Measure-Command { node .\src\search.bs.js }
+
+Days              : 0
+Hours             : 0
+Minutes           : 5
+Seconds           : 29
+Milliseconds      : 619
+Ticks             : 3296194472
+TotalDays         : 0.00381503989814815
+TotalHours        : 0.0915609575555556
+TotalMinutes      : 5.49365745333333
+TotalSeconds      : 329.6194472
+TotalMilliseconds : 329619.4472
+
+Go:
+Measure-Command {.\search.exe}
+
+ca 9 MB
+
+Days              : 0
+Hours             : 0
+Minutes           : 1
+Seconds           : 17
+Milliseconds      : 795
+Ticks             : 777957731
+TotalDays         : 0.000900414040509259
+TotalHours        : 0.0216099369722222
+TotalMinutes      : 1.29659621833333
+TotalSeconds      : 77.7957731
+TotalMilliseconds : 77795.7731
+
+Rust:
+Measure-Command {.\target\release\rs09.exe}
+
+ca. 0.5 MB
+
+
+
+Days              : 0
+Hours             : 0
+Minutes           : 0
+Seconds           : 55
+Milliseconds      : 393
+Ticks             : 553935446
+TotalDays         : 0.000641128988425926
+TotalHours        : 0.0153870957222222
+TotalMinutes      : 0.923225743333333
+TotalSeconds      : 55.3935446
+TotalMilliseconds : 55393.5446
+
+Julia:
+150 MB
+
+PS C:\Users\brp\Documents\he2021\ch09\julia09> Measure-Command {julia.exe .\search.jl}
+
+Days              : 0
+Hours             : 0
+Minutes           : 1
+Seconds           : 23
+Milliseconds      : 976
+Ticks             : 839768627
+TotalDays         : 0.000971954429398148
+TotalHours        : 0.0233269063055556
+TotalMinutes      : 1.39961437833333
+TotalSeconds      : 83.9768627
+TotalMilliseconds : 83976.8627
+
+Python:
+4.8 MB
+
+PS C:\Users\brp\Documents\he2021\ch09> Measure-Command { python .\search.py}
+
+Days              : 0
+Hours             : 0
+Minutes           : 2
+Seconds           : 19
+Milliseconds      : 351
+Ticks             : 1393510998
+TotalDays         : 0.00161285995138889
+TotalHours        : 0.0387086388333333
+TotalMinutes      : 2.32251833
+TotalSeconds      : 139.3510998
+TotalMilliseconds : 139351.0998
