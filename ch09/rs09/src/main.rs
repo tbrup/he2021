@@ -7,13 +7,18 @@
 
 use sha256::digest;
 use regex::Regex;
+use rayon::prelude::*;
 // This is the main function
 fn main() {
     let cola_re = Regex::new(r"c01a").unwrap();
     let decaf_re = Regex::new(r"decaf").unwrap();
     let post = " Cola Decaf";
 
-    for i in 10000000..100000000 {
+    //for i in 10000000..100000000 {
+
+   // rayon goes brr
+       // rayon goes brr
+        (10000000..100000000).into_par_iter().for_each(|i| {
         if i % 1000000 == 0 {
             println!("{}", i);
         }
@@ -25,5 +30,5 @@ fn main() {
             println!("{}", hash);
         }
 
-    }
+    });
 }

@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 sha256 = "1.0.2"
 regex = "1.4.5"
+rayon = "1.5.1"
