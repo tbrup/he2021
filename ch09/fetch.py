@@ -6,7 +6,7 @@ base_url = "http://46.101.107.117:2104/"
 solve_url = base_url+'order'
 
 ok_re = re.compile('Sorry, but we don\'t have that.')
-imgRe = re.compile('<img src=\"(\w+.png)\" style=\"height:')
+imgRe = re.compile('<img src=\"(\\w+.png)\" style=\"height:')
 
 post_data = {'id': '11865456 Vanilla Cafe'}
 test_data = {'id': '11865457 Vanilla Cafe'}

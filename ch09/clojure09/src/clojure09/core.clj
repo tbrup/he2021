@@ -12,6 +12,8 @@
   (def h (sha256 s))
   (if (some? (re-find #"c01a" h))
     (if (some? (re-find #"decaf" h))
+  ; (if (.contains h "c01a")
+  ;   (if (.contains h "decaf")
       (println (str "found match for " s "\n" h))
       )))
 
@@ -19,8 +21,8 @@
 (defn -main
   "My first main function"
   []
-  (def h (sha-256-hex "11865457 Vanilla Cafe")) 
-  (println h)
+  ; (def h (sha-256-hex "11865457 Vanilla Cafe")) 
+  ; (println h)
   (loop [i 10000000]
     (if (= (mod i 1000000) 0)
       (println i))

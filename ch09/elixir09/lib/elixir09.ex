@@ -41,13 +41,13 @@ defmodule Elixir09 do
     # IO.inspect
     #
     # Flow version: 33s (6 cores, 12 threads)
-    profile do
+    # profile do
       10000000..100000000 |>
       Flow.from_enumerable() |>
       Flow.map(&Ch09.searchstr/1) |>
       Flow.filter(&notempty/1) |>
       Enum.to_list |>
       IO.inspect
-    end
+    # end
   end
 end

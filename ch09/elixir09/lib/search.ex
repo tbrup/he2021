@@ -15,6 +15,11 @@ defmodule Ch09 do
     _nibbles(s, <<>>)
   end
 
+  # def nibbles(<<>>), do: <<>>
+  # def nibbles(data) do
+  #   for <<c::4 <- data>>, into: <<>>, do: <<c::8>>
+  # end
+
   def search (100000000) do
     IO.puts "done...."
   end
@@ -43,13 +48,13 @@ defmodule Ch09 do
     if rem(i,1000000) == 0 do
       IO.puts "#{i}"
     end
-    s = "#{i} Cola Decaf"
-    h = :crypto.hash(:sha256, s) |> nibbles # |>Base.encode16
-    if String.contains?(h, <<0xC::8, 0::8, 1::8, 0xA::8>>) and
-      String.contains?(h, <<0xd::8, 0xe::8, 0xC::8, 0xA::8, 0xf::8>>) do
-        IO.puts "found match for s: #{s}"
-        tmp = :crypto.hash(:sha256, s)|> Base.encode16 
-        {:ok, "found match for s; #{s}\n#{tmp}"}
+    s = to_string(i) <> " Cola Decaf"
+    h = :crypto.hash(:sha256, s) |>Base.encode16
+    if String.contains?(h, "C01A") &&
+      String.contains?(h, "DECAF") do
+        IO.puts "found match for s: #{s} #{h}"
+        # tmp = :crypto.hash(:sha256, s)|> Base.encode16 
+        {:ok, "found match for #{s}:  #{h}"}
     else
     {:ok, ""}
     end

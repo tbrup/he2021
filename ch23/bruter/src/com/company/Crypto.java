@@ -1,15 +1,16 @@
 package com.company;
 
 //import android.util.Base64;
-import java.util.Base64;
+//import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class Crypto {
-    private static final String EGG = "V1cwd05XUXhjRkpRVkRBOQ==";
+    //private static final String EGG = "V1cwd05XUXhjRkpRVkRBOQ==";
 
+    /*
     private static byte[] encrypt(String pin, byte[] clear) throws Exception {
         byte[] salt = new byte[8];
         for (int i = 0; i < 8; i++) {
@@ -31,6 +32,7 @@ public class Crypto {
         cipher.init(2, key);
         return cipher.doFinal(Base64.getDecoder().decode(enc64));
     }
+    */
     public static byte[] decrypt(String pin, byte[] raw) throws Exception {
         byte[] salt = new byte[8];
         for (int i = 0; i < 8; i++) {

@@ -24,15 +24,15 @@ def hash(text):
 # print(h)
 
 res = {}
-for i in range(10000000,100000000):
+for i in range(10000000, 100000000):
     if i % 1000000 == 0:
         print(i)
     s = b'%d Cola Decaf' % i
-    h = hash(s)
-    g = colaRe.search(h)
-    if g and decafRe.search(h):
-        print('found match for s: %s' % s)
-        print(h)
-        res[s] = h
+    h = hashlib.sha256(s).hexdigest()
+    if h.find("c01a") != -1:
+        if h.find("decaf") != -1:
+            print('found match for s: %s' % s)
+            print(h)
+            res[s] = h
 
 print(res)
