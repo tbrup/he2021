@@ -1,12 +1,12 @@
-// This is a comment, and is ignored by the compiler
-// You can test this code by clicking the "Run" button over there ->
-// or if you prefer to use your keyboard, you can use the "Ctrl + Enter" shortcut
+// This is a comment, and is ignored by the compiler You can test this code by
+// clicking the "Run" button over there -> or if you prefer to use your
+// keyboard, you can use the "Ctrl + Enter" shortcut
 
-// This code is editable, feel free to hack it!
-// You can always return to the original code by clicking the "Reset" button ->
+// This code is editable, feel free to hack it!  You can always return to the
+// original code by clicking the "Reset" button ->
 
-use sha256::digest;
 use regex::Regex;
+use sha256::digest;
 // This is the main function
 fn main() {
     let cola_re = Regex::new(r"c01a").unwrap();
@@ -24,6 +24,5 @@ fn main() {
             println!("found match for s: {}", is);
             println!("{}", hash);
         }
-
     }
 }
